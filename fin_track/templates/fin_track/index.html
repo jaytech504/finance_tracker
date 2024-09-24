@@ -1,0 +1,115 @@
+{% load crispy_forms_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finance Tracker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #1DB954;
+        }
+        .card {
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        .card h2 {
+            margin-bottom: 20px;
+            color: #1DB954;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            font-weight: bold;
+            color: #555;
+        }
+        .form-group input, .form-group select {
+            width: 80%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-top: 5px;
+        }
+        .btn {
+            background-color: #1DB954;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .btn:hover {
+            background-color: #17a645;
+        }
+        .summary {
+            text-align: center;
+            padding: 10px;
+            background-color: #1DB954;
+            color: white;
+            border-radius: 10px;
+        }
+        .summary p {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Finance Tracker</h1>
+
+        <div class="card">
+            <h2>Add Income or Expense</h2>
+            <form id="finance-form" method="POST">
+                {% csrf_token %}
+                {{ form|crispy }}
+                <button type="submit" class="btn">Add Transaction</button>
+            </form>
+        </div>
+
+        <div class="card">
+    <a href="{% url 'summary' %}" class="btn">View Summary</a>
+    
+        </div>
+    </div>
+
+    <h2>Spending Over Time</h2>
+
+    {% if graph %}
+        <img src="data:image/png;base64,{{ graph }}" alt="Spending Graph">
+    {% else %}
+        <p>No spending data available.</p>
+    {% endif %}
+    
+        <h2>Income Over Time</h2>
+
+    {% if graph %}
+        <img src="data:image/png;base64,{{ in_graph }}" alt="Income Graph">
+    {% else %}
+        <p>No Income data available.</p>
+    {% endif %}
+
+    <script>
+        // You can add your JavaScript here to handle the form submission and updating the summary
+    </script>
+</body>
+</html>
