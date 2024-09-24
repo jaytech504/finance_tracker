@@ -1,0 +1,51 @@
+<html>
+    <head>
+        <title> Summary </title>
+        <style>
+            table {
+                border: 1px solid black;
+            margin: 0 auto;
+            }
+            th, td {
+                padding: 10px;
+                margin-top: 0;
+                padding-right: 20px;
+                border-right: 1px solid black;
+                border-bottom: 1px solid black;
+            }
+            h1 {
+            text-align: center;
+            color: #1DB954;
+        }
+        p {
+            text-align: center;
+        }
+        </style>
+    </head>
+    
+    <body>
+        <h1> Summary </h1>
+        <table>
+            <tr>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Amount</th>
+                <th>Description</th>
+            </tr>
+            {% for transaction in transactions %}
+            <tr>
+                <td>{{ transaction.date }}</td>
+                <td>{{ transaction.type }}</td>
+                <td>{{ transaction.amount }}</td>
+                <td>{{ transaction.description }}</td>
+            </tr>
+            
+        {% endfor %}
+            
+        </table>
+        </br>
+        <p><b>Total Income = ${{ total_income }}</b></p>
+        <p><b>Total Expense = ${{ total_expense }}</b></p>
+        <p><b>Balance = ${{ balance }}</b></p>
+    </body>
+</html>
