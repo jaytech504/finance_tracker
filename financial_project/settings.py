@@ -126,3 +126,7 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+YODLEE_CLIENT_ID = '5TcmoSLhcsazaKhNkYhPYM6qJtO9h6ytVDrE8hImW232K59E'
+YODLEE_CLIENT_SECRET = 'u28IdBtCMOXuo5SAnupr5HPZILuqNlnvAq4sBnDJUIls7jv9rAjXrBHiqArBbkyo'
+YODLEE_API_URL = 'https://sandbox.api.yodlee.com/ysl'

@@ -4,7 +4,8 @@
         <style>
             table {
                 border: 1px solid black;
-            margin: 0 auto;
+            width: 700px;
+            margin-left: 40px;
             }
             th, td {
                 padding: 10px;
@@ -15,15 +16,61 @@
             }
             h1 {
             text-align: center;
-            color: #1DB954;
+            color: #0095ff;
+        }
+        * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
         }
         p {
             text-align: center;
         }
+        .sidebar {
+  background-color: #f0f0f5;
+  width: 220px;
+  padding: 20px;
+}
+
+.sidebar .logo {
+  font-size: 24px;
+  font-weight: bold;
+  color: #0095ff;
+  margin-bottom: 30px;
+}
+
+.sidebar nav a {
+  display: block;
+  padding: 10px 0;
+  color: #333;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.sidebar nav a.active {
+  color: #0095ff;
+}
+.container {
+        display: flex;
+    }
+
         </style>
     </head>
     
     <body>
+        <div class="container">
+        <aside class="sidebar">
+            <div class="logo">Finance.io</div>
+            <nav>
+              <a href="{% url 'home' %}">Dashboard</a>
+              <a href="{% url 'transact' %}" >+ Add Transaction</a>
+              <a href="#">Linked Bank Cards</a>
+              <a href="{% url 'summary' %}" class="active">Summary</a>
+              
+            </nav>
+          </aside>
+        <div>
         <h1> Summary </h1>
         <table>
             <tr>
@@ -43,6 +90,8 @@
         {% endfor %}
             
         </table>
+        </div>
+        </div>
         </br>
         <p><b>Total Income = ${{ total_income }}</b></p>
         <p><b>Total Expense = ${{ total_expense }}</b></p>

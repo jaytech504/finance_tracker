@@ -1,0 +1,128 @@
+{% load crispy_forms_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Transaction</title>
+  <style>
+    body {
+        background-color: #fff;
+        color: #333;
+        margin: 0;
+        padding: 0;
+    }
+    * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+    }
+    .container {
+        display: flex;
+  height: 100vh;
+    }
+    h1 {
+        text-align: center;
+        color: #0095ff;
+    }
+    .card {
+        width: 600px;
+        background-color: #fff;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    .card h2 {
+        margin-bottom: 20px;
+        color: #0095ff;
+    }
+    .form-group {
+        margin-bottom: 15px;
+    }
+    .form-group label {
+        font-weight: bold;
+        color: #555;
+    }
+    .form-group input, .form-group select {
+        width: 80%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        margin-top: 5px;
+    }
+    .btn {
+        background-color: #0095ff;
+        color: #fff;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    .btn:hover {
+        background-color: #0095ff;
+    }
+    .summary {
+        text-align: center;
+        padding: 10px;
+        background-color: #0095ff;
+        color: white;
+        border-radius: 10px;
+    }
+    .summary p {
+        font-size: 18px;
+        font-weight: bold;
+        margin: 10px 0;
+    }
+    .sidebar {
+  background-color: #f0f0f5;
+  width: 220px;
+  padding: 20px;
+}
+
+.sidebar .logo {
+  font-size: 24px;
+  font-weight: bold;
+  color: #0095ff;
+  margin-bottom: 30px;
+}
+
+.sidebar nav a {
+  display: block;
+  padding: 10px 0;
+  color: #333;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.sidebar nav a.active {
+  color: #0095ff;
+}
+
+</style>
+</head>
+<body>
+    <div class="container">
+            <!-- Sidebar Menu -->
+            <aside class="sidebar">
+              <div class="logo">Finance.io</div>
+              <nav>
+                <a href="{% url 'home' %}">Dashboard</a>
+                <a href="{% url 'transact' %}" class="active">+ Add Transaction</a>
+                <a href="#">Linked Bank Cards</a>
+                <a href="{% url 'summary' %}">Summary</a>
+                
+              </nav>
+            </aside>
+        
+            
+        <div class="card">
+            <h2>Add Transaction</h2>
+            <form id="finance-form" method="POST">
+                {% csrf_token %}
+                {{ form|crispy }}
+                <button type="submit" class="btn">Add Transaction</button>
+            </form>
+        </div>
+    </div>
+</body>

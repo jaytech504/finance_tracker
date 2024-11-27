@@ -1,5 +1,6 @@
 from django.db import models
 from django.db.models import Sum
+from django.contrib.auth.models import User
 
 class Transaction(models.Model):
     TRANSACTION_TYPES = [
@@ -7,10 +8,16 @@ class Transaction(models.Model):
         ('expense', 'Expense'),
     ]
 
+    SOURCES = [
+        ('Manual', 'Manual'),
+        ('Bank', 'Bank'),
+    ]
+
     type = models.CharField(max_length=7, choices=TRANSACTION_TYPES)
     description = models.CharField(max_length=255)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     date = models.DateTimeField(auto_now_add=True)
+    source = models.CharField(max_length=10, choices=SOURCES, default='Manual')
 
     def __str__(self):
         return f"{self.get_type_display()} - {self.description}: ${self.amount}"
@@ -36,4 +43,13 @@ class Transaction(models.Model):
         total_income = cls.total_income()
         total_expense = cls.total_expense()
         return total_income - total_expense
+
+class LinkedCard(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    account_name = models.CharField(max_length=255)
+    account_number = models.CharField(max_length=20)
+    provider_name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return f"{self.account_name} ({self.provider_name})"
     
