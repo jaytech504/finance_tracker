@@ -5,6 +5,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Finance Tracker Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/decimal.js/10.4.3/decimal.min.js"></script>
+
   <style>
     * {
   margin: 0;
@@ -193,19 +196,7 @@
       <!-- Graph and Transaction History -->
       <section class="graph-history">
         <div class="graph">
-          <div>
-            {% if graph %}
-        <img src="data:image/png;base64,{{ graph }}" alt="Spending Graph">
-    {% else %}
-        <p>No spending data available.</p>
-    {% endif %}
-
-    {% if graph %}
-        <img src="data:image/png;base64,{{ in_graph }}" alt="Income Graph">
-    {% else %}
-        <p>No Income data available.</p>
-    {% endif %}
-    </div>
+        <canvas id="financeChart" width="200" height="100"></canvas>
         </div>
         <div class="transaction-history">
           <h4>Your Transaction History</h4>
@@ -218,6 +209,65 @@
       </section>
     </main>
   </div>
+
+  <script>
+    const ctx = document.getElementById('financeChart').getContext('2d');
+    const financeChart = new Chart(ctx, {
+        type: 'line', // Use 'bar' for bar chart
+        data: {
+            labels: {{ income_labels|safe }}, // Dates
+            datasets: [
+                {
+                    label: 'Income',
+                    data: {{ income_values|safe}},
+                    borderColor: '#0095ff', // Primary theme color
+                    backgroundColor: 'rgba(0, 149, 255, 0.2)', // Transparent blue fill
+                    borderWidth: 2,
+                    tension: 0.3, // Smooth curves
+                },
+                {
+                    label: 'Expenses',
+                    data: {{ expense_values|safe }},
+                    borderColor: 'rgba(255, 99, 132, 1)', // Red for contrast
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)', // Transparent red fill
+                    borderWidth: 2,
+                    tension: 0.3,
+                },
+            ],
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                tooltip: {
+                    enabled: true,
+                },
+            },
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Date',
+                    },
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Amount (₹)',
+                    },
+                    beginAtZero: true,
+                },
+            },
+        },
+    });
+</script>
+<script>
+  console.log("Transaction Dates:", {{ income_values|safe }});
+  console.log("Transaction Amounts:", {{ expense_values|safe }});
+</script>
+
 
 </body>
 </html>

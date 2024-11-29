@@ -4,6 +4,8 @@ from .models import Transaction, LinkedCard
 from .forms import TransactionForm
 from .yodlee_utils import get_yodlee_access_token, fetch_transactions
 from .utils import save_yodlee_transactions
+from django.db.models import Sum
+from decimal import Decimal
 import pandas as pd
 import matplotlib.pyplot as plt
 from io import BytesIO
@@ -19,80 +21,37 @@ def home(request):
     tot_history = list(Transaction.objects.all())
     trans_history = tot_history[-1:-6:-1]
 
-    transactions = Transaction.objects.filter(type='expense').values('date', 'amount')
+    transactions = Transaction.objects.all()
 
     # Convert transactions to a DataFrame
-    df = pd.DataFrame(list(transactions))
+    income_data = (
+        transactions.filter(type='income')
+        .values('date', 'amount')
+        .order_by('date')
+    )
+    expense_data = (
+        transactions.filter(type='expense')
+        .values('date', 'amount')
+        .order_by('date')
+    )
 
-    # If there are transactions, proceed to create the graph
-    if not df.empty:
-        # Convert the date to datetime for easier plotting
-        df['date'] = pd.to_datetime(df['date'])
+    income_labels = [entry['date'].strftime('%Y-%m-%d') for entry in income_data]
+    income_values = [float(entry['amount']) for entry in income_data]
+    expense_labels = [entry['date'].strftime('%Y-%m-%d') for entry in expense_data]
+    expense_values = [float(entry['amount']) for entry in expense_data]
 
-        # Group the data by date and sum the amounts for each date
-        df_grouped = df.groupby(df['date'].dt.date)['amount'].sum()
+    print(income_values)
+    print(expense_values)
 
-        # Create the plot
-        plt.figure(figsize=(8, 4))
-        plt.plot(df_grouped.index, df_grouped.values, marker='o', linestyle='-', color='blue')
-        plt.title('Spending Over Time')
-        plt.xlabel('Date')
-        plt.ylabel('Total Spending')
-        plt.xticks(rotation=45)
-        plt.tight_layout()
-
-        # Save the plot to a BytesIO object and encode it as base64
-        buffer = BytesIO()
-        plt.savefig(buffer, format='png')
-        buffer.seek(0)
-        image_png = buffer.getvalue()
-        buffer.close()
-
-        graph = base64.b64encode(image_png).decode('utf-8')
-
-    else:
-        graph = None
-
-    in_transactions = Transaction.objects.filter(type='income').values('date', 'amount')
-
-    # Convert transactions to a DataFrame
-    in_df = pd.DataFrame(list(in_transactions))
-
-    # If there are transactions, proceed to create the graph
-    if not in_df.empty:
-        # Convert the date to datetime for easier plotting
-        in_df['date'] = pd.to_datetime(in_df['date'])
-
-        # Group the data by date and sum the amounts for each date
-        in_df_grouped = in_df.groupby(in_df['date'].dt.date)['amount'].sum()
-
-        # Create the plot
-        plt.figure(figsize=(8, 4))
-        plt.plot(in_df_grouped.index, in_df_grouped.values, marker='o', linestyle='-', color='blue')
-        plt.title('Income Over Time')
-        plt.xlabel('Date')
-        plt.ylabel('Total Income')
-        plt.xticks(rotation=45)
-        plt.tight_layout()
-
-        # Save the plot to a BytesIO object and encode it as base64
-        buffer = BytesIO()
-        plt.savefig(buffer, format='png')
-        buffer.seek(0)
-        image_png = buffer.getvalue()
-        buffer.close()
-
-        in_graph = base64.b64encode(image_png).decode('utf-8')
-
-    else:
-        in_graph = None
     context = {
             'total_expense': total_expense,
             'total_income': total_income,
             'balance': balance,
-            'graph': graph,
-            'in_graph': in_graph,
             'trans_history': trans_history,
+            'income_labels': income_labels,
+            'income_values': income_values,
+            'expense_labels': expense_labels,
+            'expense_values': expense_values,
         }
     return render(request, 'fin_track/index.html', context)
 
