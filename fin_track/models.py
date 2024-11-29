@@ -43,13 +43,4 @@ class Transaction(models.Model):
         total_income = cls.total_income()
         total_expense = cls.total_expense()
         return total_income - total_expense
-
-class LinkedCard(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    account_name = models.CharField(max_length=255)
-    account_number = models.CharField(max_length=20)
-    provider_name = models.CharField(max_length=255)
-
-    def __str__(self):
-        return f"{self.account_name} ({self.provider_name})"
     

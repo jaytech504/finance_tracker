@@ -2,8 +2,10 @@ from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from .models import Transaction, LinkedCard
 from .forms import TransactionForm
-from .yodlee_utils import get_yodlee_access_token, fetch_transactions
-from .utils import save_yodlee_transactions
+from plaid.api import plaid_api
+from plaid.model import *
+from plaid import Configuration, ApiClient
+import os
 from django.db.models import Sum
 from decimal import Decimal
 import pandas as pd
@@ -11,6 +13,7 @@ import matplotlib.pyplot as plt
 from io import BytesIO
 import base64
 
+from datetime import datetime, timedelta
 
 
 # Create your views here.
@@ -99,46 +102,66 @@ def add_transaction(request):
 
     return render(request, 'fin_track/transaction.html', context)
 
-def link_bank_card(request):
-    """
-    Generate a FastLink URL for users to link their bank card.
-    """
-    # Get Yodlee access token
-    access_token = get_yodlee_access_token()
+def initialize_plaid():
+    configuration = Configuration(
+        host="https://sandbox.plaid.com",
+        api_key={
+            "clientId": os.getenv("PLAID_CLIENT_ID"),
+            "secret": os.getenv("PLAID_SECRET")
+        },
+    )
+    api_client = ApiClient(configuration)
+    return plaid_api.PlaidApi(api_client)
 
-    # Generate the FastLink URL
-    fastlink_url = "https://sandbox.yodlee.com/ysl/fastlink/v1/"  # Update for production
-    app_token = access_token  # Yodlee uses the same token as an app token
-    user_token = access_token  # Replace with actual user token for production
+plaid_client = initialize_plaid()
 
-    # Example parameters to pass to FastLink
-    fastlink_params = {
-        "app_token": app_token,
-        "user_token": user_token,
-        "extra_params": {
-            "configName": "Aggregation"  # Example config for fetching transactions
-        }
-    }
+def plaid_link_token(request):
+    # Generate a link token for the client
+    request_body = LinkTokenCreateRequest(
+        user=LinkTokenCreateRequestUser(client_user_id=str(request.user.id)),
+        client_name="Voton",
+        products=["transactions"],
+        country_codes=["US"],
+        language="en"
+    )
+    response = plaid_client.link_token_create(request_body)
+    return JsonResponse({"link_token": response["link_token"]})
 
-    # Redirect or render a template to display FastLink
-    return render(request, "link_bank_card.html", {"fastlink_url": fastlink_url, "params": fastlink_params})
-
-
-def save_linked_card(request):
-    """
-    Save the linked card details to the database.
-    """
+def exchange_public_token(request):
     if request.method == "POST":
-        card_data = json.loads(request.body)
-
-        # Save card details (example fields, modify as needed)
-        LinkedCard.objects.create(
-            account_name=card_data.get("accountName"),
-            account_number=card_data.get("accountNumber"),
-            provider_name=card_data.get("providerName"),
-            user=request.user  # Link to the logged-in user
+        public_token = request.POST.get("public_token")
+        response = plaid_client.item_public_token_exchange(
+            PublicTokenExchangeRequest(public_token=public_token)
         )
+        access_token = response["access_token"]
+        # Store access_token securely for the user
+        request.user.profile.plaid_access_token = access_token
+        request.user.profile.save()
+        return JsonResponse({"message": "Access token saved"})
 
-        return JsonResponse({"message": "Card details saved successfully."}, status=201)
+def fetch_transactions(request):
+    if request.user.profile.plaid_access_token:
+        start_date = (datetime.now() - timedelta(days=30)).strftime("%Y-%m-%d")
+        end_date = datetime.now().strftime("%Y-%m-%d")
+        
+        request_body = TransactionsGetRequest(
+            access_token=request.user.profile.plaid_access_token,
+            start_date=start_date,
+            end_date=end_date,
+        )
+        response = plaid_client.transactions_get(request_body)
 
-    return JsonResponse({"error": "Invalid request method."}, status=400)
+        transactions = response["transactions"]
+        for txn in transactions:
+            transaction_type = 'income' if txn["amount"] > 0 else 'expense'
+            Transaction.objects.create(
+                date=txn["date"],
+                amount=abs(txn["amount"]),
+                description=txn["name"],
+                transaction_type=transaction_type,
+                source="plaid",
+            )
+
+        return JsonResponse({"message": "Transactions fetched and categorized"})
+    else:
+        return JsonResponse({"error": "No Plaid access token found"}, status=400)

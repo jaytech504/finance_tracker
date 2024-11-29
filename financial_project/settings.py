@@ -127,6 +127,7 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-YODLEE_CLIENT_ID = '5TcmoSLhcsazaKhNkYhPYM6qJtO9h6ytVDrE8hImW232K59E'
-YODLEE_CLIENT_SECRET = 'u28IdBtCMOXuo5SAnupr5HPZILuqNlnvAq4sBnDJUIls7jv9rAjXrBHiqArBbkyo'
-YODLEE_API_URL = 'https://sandbox.api.yodlee.com/ysl'
+PLAID_CLIENT_ID = "6746e71ed74216001aa5b12e"
+PLAID_SECRET = "811acc332fef3c012cec450cb0da25"
+PLAID_ENV = "sandbox"  # Use 'sandbox' for development, 'production' for live apps
+
