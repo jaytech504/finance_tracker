@@ -1,33 +1,79 @@
 <html>
     <head>
         <title> Summary </title>
+
         <style>
-            table {
-                border: 1px solid black;
-            width: 700px;
-            margin-left: 40px;
-            }
-            th, td {
-                padding: 10px;
-                margin-top: 0;
-                padding-right: 20px;
-                border-right: 1px solid black;
-                border-bottom: 1px solid black;
-            }
-            h1 {
-            text-align: center;
-            color: #0095ff;
-        }
-        * {
+            .transaction-history {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    width: 80%;
+    text-align: center;
+}
+
+.transaction-history h2 {
+    font-size: 1.8em;
+    color: #2c3e50;
+    margin-bottom: 15px;
+}
+
+.transaction-history table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #f9f9f9;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    border-radius: 8px;
+}
+
+.transaction-history th, .transaction-history td {
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+.transaction-history th {
+    background-color: #0095ff;
+    color: white;
+    font-size: 1.1em;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.transaction-history tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+.transaction-history tr:hover {
+    background-color: #d9e3f7;
+}
+
+.transaction-history td {
+    font-size: 1em;
+    color: #34495e;
+}
+
+.transaction-history .income {
+    color: #27ae60;
+    font-weight: bold;
+}
+
+.transaction-history .expense {
+    color: #e74c3c;
+    font-weight: bold;
+}
+* {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
   font-family: Arial, sans-serif;
-        }
-        p {
-            text-align: center;
-        }
-        .sidebar {
+}
+
+.container {
+  display: flex;
+  height: 100vh;
+}
+
+.sidebar {
   background-color: #f0f0f5;
   width: 220px;
   padding: 20px;
@@ -51,11 +97,27 @@
 .sidebar nav a.active {
   color: #0095ff;
 }
-.container {
-        display: flex;
-    }
 
+.main-content {
+  flex-grow: 1;
+  padding: 20px;
+  background-color: #ffffff;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 20px;
+}
+
+.header .header-links a {
+  margin-right: 20px;
+  color: #666;
+  text-decoration: none;
+}
         </style>
+        
     </head>
     
     <body>
@@ -64,21 +126,23 @@
             <div class="logo">Finance.io</div>
             <nav>
               <a href="{% url 'home' %}">Dashboard</a>
-              <a href="{% url 'transact' %}" >+ Add Transaction</a>
-              <a href="#">Linked Bank Cards</a>
+              <a href="{% url 'transact' %}" >Add Transaction</a>
               <a href="{% url 'summary' %}" class="active">Summary</a>
               
             </nav>
           </aside>
-        <div>
-        <h1> Summary </h1>
+          <div class="transaction-history">
+            <h2>Financial Transaction History</h2>
         <table>
+            <thead>
             <tr>
                 <th>Date</th>
                 <th>Type</th>
                 <th>Amount</th>
                 <th>Description</th>
             </tr>
+            </thead>
+            <tbody>
             {% for transaction in transactions %}
             <tr>
                 <td>{{ transaction.date }}</td>
@@ -88,6 +152,7 @@
             </tr>
             
         {% endfor %}
+        </tbody>
             
         </table>
         </div>
@@ -96,5 +161,6 @@
         <p><b>Total Income = ${{ total_income }}</b></p>
         <p><b>Total Expense = ${{ total_expense }}</b></p>
         <p><b>Balance = ${{ balance }}</b></p>
+
     </body>
 </html>

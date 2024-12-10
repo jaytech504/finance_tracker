@@ -5,9 +5,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Finance Tracker Dashboard</title>
+  <script src="https://connect.withmono.com/connect.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/decimal.js/10.4.3/decimal.min.js"></script>
-  <script src="https://cdn.plaid.com/link/v2/stable/link-initialize.js"></script>
 
 
   <style>
@@ -111,6 +111,11 @@
   flex: 2;
 }
 
+#transactionsPieChart {
+        max-width: 300px;
+        max-height: 300px;
+    }
+
 .date-range button {
   margin-right: 10px;
   background-color: #0095ff;
@@ -165,8 +170,7 @@
       <div class="logo">Finance.io</div>
       <nav>
         <a href="#" class="active">Dashboard</a>
-        <a href="{% url 'transact' %}">+ Add Transaction</a>
-        <a href="{% url 'link_bank_card' %}">Linked Bank Cards</a>
+        <a href="{% url 'transact' %}">Add Transaction</a>
         <a href="{% url 'summary' %}">Summary</a>
         
       </nav>
@@ -199,6 +203,8 @@
       <section class="graph-history">
         <div class="graph">
         <canvas id="financeChart" width="200" height="100"></canvas>
+        <canvas id="transactionsPieChart" width="200" height="100"></canvas>
+        <canvas id="incomeExpenseChart" width="200" height="100"></canvas>
         </div>
         <div class="transaction-history">
           <h4>Your Transaction History</h4>
@@ -211,6 +217,59 @@
       </section>
     </main>
   </div>
+
+  <script>
+    const monoConnect = MonoConnect.setup({
+            key: "test_pk_dh0i4nh786nkkv9fcqc6",  // Replace with your actual public key
+            onClose: () => console.log("Widget closed"),
+            onSuccess: ({ code }) => {
+                fetch("/fetch-transactions/", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": "{{ csrf_token }}",
+                    },
+                    body: JSON.stringify({ code }),
+                })
+                .then(response => response.json())
+                .then(data => console.log(data))
+                .catch(error => console.error("Error:", error));
+            },
+        });
+
+        // Open Mono Connect widget on button click
+        document.getElementById("mono-connect").addEventListener("click", () => monoConnect.open());
+
+    // Chart Data
+    const transactionsData = {{ transactions_data|safe }};
+    let income = 0, expenses = 0;
+
+    transactionsData.forEach(txn => {
+        if (txn.amount > 0) {
+            income += txn.amount;
+        } else {
+            expenses += Math.abs(txn.amount);
+        }
+    });
+
+    const incomeExpenseCtx = document.getElementById('incomeExpenseChart').getContext('2d');
+    new Chart(incomeExpenseCtx, {
+        type: 'pie',
+        data: {
+            labels: ['Income', 'Expenses'],
+            datasets: [{
+                data: [income, expenses],
+                backgroundColor: ['green', 'red'],
+            }],
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'top' },
+            },
+        },
+    });
+</script>
 
   <script>
     const ctx = document.getElementById('financeChart').getContext('2d');
@@ -266,10 +325,47 @@
     });
 </script>
 <script>
-  console.log("Transaction Dates:", {{ income_values|safe }});
-  console.log("Transaction Amounts:", {{ expense_values|safe }});
-</script>
+  const gtx = document.getElementById('transactionsPieChart').getContext('2d');
+  const transactionsPieChart = new Chart(gtx, {
+      type: 'doughnut', // Type of chart
+      data: {
+          labels: ['Income', 'Expenses'], // Labels for the chart
+          datasets: [{
+              label: 'Transactions',
+              data: [
+                  {{ total_income|default:0 }},  // Pass total income from the view
+                  {{ total_expense|default:0 }} // Pass total expenses from the view
+              ],
+              backgroundColor: [
+                  '#0095ff', // Green for income
+                  'rgba(255, 99, 132, 1)'  // Red for expenses
+              ],
+              borderColor: [
+                  '#ffffff', // White border for better visibility
+                  '#ffffff'
+              ],
+              borderWidth: 2
+          }]
+      },
+      options: {
+          responsive: true,
+          plugins: {
+              legend: {
+                  position: 'top',
+              },
+              tooltip: {
+                  callbacks: {
+                      label: function(tooltipItem) {
+                          return tooltipItem.label + ': ' + tooltipItem.raw.toLocaleString();
+                      }
+                  }
+              }
+          }
+      }
+  });
 
+
+</script>
 
 </body>
 </html>
