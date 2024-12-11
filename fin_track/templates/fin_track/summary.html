@@ -1,123 +1,8 @@
+{% load static %}
 <html>
     <head>
         <title> Summary </title>
-
-        <style>
-            .transaction-history {
-    font-family: Arial, sans-serif;
-    margin: 20px;
-    width: 80%;
-    text-align: center;
-}
-
-.transaction-history h2 {
-    font-size: 1.8em;
-    color: #2c3e50;
-    margin-bottom: 15px;
-}
-
-.transaction-history table {
-    width: 100%;
-    border-collapse: collapse;
-    background: #f9f9f9;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    border-radius: 8px;
-}
-
-.transaction-history th, .transaction-history td {
-    padding: 12px 15px;
-    border: 1px solid #ddd;
-    text-align: left;
-}
-
-.transaction-history th {
-    background-color: #0095ff;
-    color: white;
-    font-size: 1.1em;
-    text-transform: uppercase;
-    letter-spacing: 0.03em;
-}
-
-.transaction-history tr:nth-child(even) {
-    background-color: #f2f2f2;
-}
-
-.transaction-history tr:hover {
-    background-color: #d9e3f7;
-}
-
-.transaction-history td {
-    font-size: 1em;
-    color: #34495e;
-}
-
-.transaction-history .income {
-    color: #27ae60;
-    font-weight: bold;
-}
-
-.transaction-history .expense {
-    color: #e74c3c;
-    font-weight: bold;
-}
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: Arial, sans-serif;
-}
-
-.container {
-  display: flex;
-  height: 100vh;
-}
-
-.sidebar {
-  background-color: #f0f0f5;
-  width: 220px;
-  padding: 20px;
-}
-
-.sidebar .logo {
-  font-size: 24px;
-  font-weight: bold;
-  color: #0095ff;
-  margin-bottom: 30px;
-}
-
-.sidebar nav a {
-  display: block;
-  padding: 10px 0;
-  color: #333;
-  text-decoration: none;
-  font-weight: bold;
-}
-
-.sidebar nav a.active {
-  color: #0095ff;
-}
-
-.main-content {
-  flex-grow: 1;
-  padding: 20px;
-  background-color: #ffffff;
-}
-
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-bottom: 20px;
-}
-
-.header .header-links a {
-  margin-right: 20px;
-  color: #666;
-  text-decoration: none;
-}
-        </style>
-        
+        <link rel="stylesheet" type="text/css" href="{% static 'css/main.css' %}">
     </head>
     
     <body>
@@ -126,11 +11,33 @@
             <div class="logo">Finance.io</div>
             <nav>
               <a href="{% url 'home' %}">Dashboard</a>
-              <a href="{% url 'transact' %}" >Add Transaction</a>
               <a href="{% url 'summary' %}" class="active">Summary</a>
+              <a href="{% url 'report' %}">Report</a>
               
             </nav>
           </aside>
+          <div class="popup-overlay" id="popup">
+            <div class="popup-content">
+                <span class="close-btn" id="close-popup">&times;</span>
+                <h2>Add Transaction</h2>
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="form-group">
+                          <p for="type">Type</p>
+                          {{ form.type }}
+                      </div>
+                      <div class="form-group">
+                          <p for="description">Description</p>
+                          {{ form.description }}
+                      </div>
+                      <div class="form-group">
+                          <p for="amount">Amount</p>
+                          {{ form.amount }}
+                      </div>
+                        <button type="submit" class="btn">Add Transaction</button>
+                    </form>
+            </div>
+        </div>
           <div class="transaction-history">
             <h2>Financial Transaction History</h2>
         <table>
@@ -161,6 +68,8 @@
         <p><b>Total Income = ${{ total_income }}</b></p>
         <p><b>Total Expense = ${{ total_expense }}</b></p>
         <p><b>Balance = ${{ balance }}</b></p>
+
+        
 
     </body>
 </html>
