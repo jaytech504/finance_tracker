@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'fin_track',
+    'users',
     'crispy_forms',
     'crispy_bootstrap4',
 ]
@@ -125,6 +126,10 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
+
+# settings.py
+LOGIN_REDIRECT_URL = '/dashboard/'  # Redirect to the homepage or any other URL
+
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 

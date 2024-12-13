@@ -1,0 +1,129 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blue Theme Landing Page</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #E0F7FF, #B3E5FC);
+            color: #03396c;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background: #0095ff;
+            color: white;
+        }
+
+        header .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        header nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 1rem;
+            font-weight: 500;
+        }
+
+        header nav a:hover {
+            text-decoration: underline;
+        }
+
+        .hero {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: auto;
+        }
+
+        .hero-content {
+            max-width: 50%;
+        }
+
+        .hero-content h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .hero-content p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .hero-buttons button {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .hero-buttons .btn-primary {
+            background: #0095ff;
+            color: white;
+        }
+
+        .hero-buttons .btn-secondary {
+            background: #B3E5FC;
+            color: #03396c;
+        }
+
+        .hero-buttons button:hover {
+            transform: scale(1.05);
+        }
+
+        .illustration {
+            max-width: 47%;
+        }
+
+        footer {
+            text-align: center;
+            padding: 1rem;
+            background: #0095ff;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">Finance.io</div>
+        <nav>
+            <a href="#">About</a>
+            <a href="#">Sign In</a>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Track Your Money</h1>
+            <p>Simplify your financial journey with cutting-edge tools and insights that help you understand, manage, and optimize your money. Whether you're tracking expenses, analyzing income, or planning for the future, our platform gives you the power to make informed decisions with confidence.</p>
+            <div class="hero-buttons">
+                <button class="btn-primary"><a href="{% url 'register' %}">Get Started</a></button>
+                <button class="btn-secondary"><a href="{% url 'login' %}">Sign In</a></button>
+            </div>
+        </div>
+        <img src="{% static 'finance.png' %}" alt="Illustration" class="illustration">
+    </section>
+
+    <footer>
+        &copy; 2024 BluSend. All rights reserved.
+    </footer>
+</body>
+</html>

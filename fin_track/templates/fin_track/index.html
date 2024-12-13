@@ -26,6 +26,7 @@
         <button id="open-popup">Add Transaction</button>
         <a href="{% url 'summary' %}">Summary</a>
         <a href="{% url 'report' %}">Report</a>
+        <a href="{% url 'logout' %}">Logout</a>
         
       </nav>
     </aside>
@@ -34,7 +35,7 @@
     <main class="main-content">
       <!-- Header with Profile -->
       <header class="header">
-        <div class="profile">Hi, Akhil <img src="profile.jpg" alt="Profile"></div>
+        <div class="profile">Hi, {{ user.username }}</div>
       </header>
 
       <!-- Summary Cards -->
