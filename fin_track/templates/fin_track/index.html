@@ -10,11 +10,6 @@
   <script src="https://connect.withmono.com/connect.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/decimal.js/10.4.3/decimal.min.js"></script>
-
-
-  <style>
-  
-  </style>
 </head>
 <body>
   <div class="container">
@@ -30,9 +25,15 @@
         
       </nav>
     </aside>
-
     <!-- Main Content Area -->
     <main class="main-content">
+        {% if messages %}
+                <div>
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
       <!-- Header with Profile -->
       <header class="header">
         <div class="profile">Hi, {{ user.username }}</div>
@@ -59,25 +60,25 @@
         <div class="popup-overlay" id="popup">
     <div class="popup-content">
         <span class="close-btn" id="close-popup">&times;</span>
-        <h2>Add Transaction</h2>
-            <form method="POST">
-                {% csrf_token %}
-                <div class="form-group">
-                  <p for="type">Type</p>
-                  {{ form.type }}
-              </div>
-              <div class="form-group">
-                  <p for="description">Description</p>
-                  {{ form.description }}
-              </div>
-              <div class="form-group">
-                  <p for="amount">Amount</p>
-                  {{ form.amount }}
-              </div>
-                <button type="submit" class="btn">Add Transaction</button>
-            </form>
+        <h2> Add Transaction</h2>
+                            <form method="post" class="mb-3">
+                                {% csrf_token %}
+                                {{ form|crispy }}
+                                <button type="submit" class="btn btn-success w-100" name="add_transaction">
+                                    Add Transaction
+                                </button>
+                            </form>
+
+                            <form method="post" enctype="multipart/form-data" class="mb-3">
+                                {% csrf_token %}
+                                
+                                    <input type="file" id="csv_file" name="csv_file" accept=".csv" required>
+                                <button type="submit" class="btn btn-secondary w-100" name="upload_csv">
+                                    Upload CSV
+                                </button>
+                            </form>
+        </div>
     </div>
-</div>
         <div class="graph">
         <canvas id="financeChart" width="200" height="100"></canvas>
         <canvas id="transactionsPieChart" width="200" height="100"></canvas>
@@ -94,60 +95,6 @@
       </section>
     </main>
   </div>
-
-  <script>
-    const monoConnect = MonoConnect.setup({
-            key: "test_pk_dh0i4nh786nkkv9fcqc6",  // Replace with your actual public key
-            onClose: () => console.log("Widget closed"),
-            onSuccess: ({ code }) => {
-                fetch("/fetch-transactions/", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-CSRFToken": "{{ csrf_token }}",
-                    },
-                    body: JSON.stringify({ code }),
-                })
-                .then(response => response.json())
-                .then(data => console.log(data))
-                .catch(error => console.error("Error:", error));
-            },
-        });
-
-        // Open Mono Connect widget on button click
-        document.getElementById("mono-connect").addEventListener("click", () => monoConnect.open());
-
-    // Chart Data
-    const transactionsData = {{ transactions_data|safe }};
-    let income = 0, expenses = 0;
-
-    transactionsData.forEach(txn => {
-        if (txn.amount > 0) {
-            income += txn.amount;
-        } else {
-            expenses += Math.abs(txn.amount);
-        }
-    });
-
-    const incomeExpenseCtx = document.getElementById('incomeExpenseChart').getContext('2d');
-    new Chart(incomeExpenseCtx, {
-        type: 'pie',
-        data: {
-            labels: ['Income', 'Expenses'],
-            datasets: [{
-                data: [income, expenses],
-                backgroundColor: ['green', 'red'],
-            }],
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: { position: 'top' },
-            },
-        },
-    });
-</script>
-
   <script>
     const ctx = document.getElementById('financeChart').getContext('2d');
     const financeChart = new Chart(ctx, {

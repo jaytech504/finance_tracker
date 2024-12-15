@@ -15,10 +15,8 @@ import os
 import csv
 from django.db.models import Sum
 from decimal import Decimal
-from io import BytesIO
-import base64
-
 from datetime import datetime, timedelta
+from django.contrib import messages
 
 
 
@@ -30,15 +28,72 @@ def home(request):
 
     transactions = Transaction.objects.filter(user=request.user).order_by('-date')
 
+    form = TransactionForm()
     if request.method == 'POST':
-        form = TransactionForm(request.POST)
-        if form.is_valid():
-            transaction = form.save(commit=False)
-            transaction.user = request.user  # Assign the transaction to the logged-in user
-            transaction.save()
-            return redirect('home')
-    else:
-        form = TransactionForm()
+        if 'add_transaction' in request.POST:  # Handle manual transaction form
+            form = TransactionForm(request.POST)
+            if form.is_valid():
+                transaction = form.save(commit=False)
+                transaction.user = request.user
+                transaction.save()
+                return redirect('home')
+
+        elif 'upload_csv' in request.POST:  # Handle CSV upload
+            csv_file = request.FILES.get('csv_file')
+
+            # Check if a file was uploaded
+            if not csv_file:
+                messages.error(request, "Please upload a CSV file.")
+                return redirect('home')
+
+            # Check if the file is a CSV
+            if not csv_file.name.endswith('.csv'):
+                messages.error(request, "Invalid file type. Please upload a .csv file.")
+                return redirect('home')
+
+            try:
+                decoded_file = csv_file.read().decode('utf-8').splitlines()
+                reader = csv.DictReader(decoded_file)
+
+                # Check for required columns
+                required_columns = {'date', 'description', 'amount', 'type'}
+                if not required_columns.issubset(reader.fieldnames):
+                    messages.error(
+                        request, 
+                        f"CSV file is missing required columns. Please ensure your CSV includes: {', '.join(required_columns)}"
+                    )
+                    return redirect('home')
+
+                # Process rows
+                for row in reader:
+                    try:
+                        # Validate amount
+                        amount = float(row['amount'])
+                        if row['type'] not in ['income', 'expense']:
+                            raise ValueError("Invalid transaction type. Use 'income' or 'expense'.")
+
+                        # Validate date
+                        transaction_date = datetime.strptime(row['date'], '%Y-%m-%d')
+
+                        # Create transaction
+                        Transaction.objects.create(
+                            user=request.user,
+                            date=transaction_date,
+                            description=row['description'],
+                            amount=amount,
+                            type=row['type'],
+                        )
+                    except Exception as e:
+                        messages.warning(
+                            request, 
+                            f"Skipping row due to error: {row}. Error: {str(e)}"
+                        )
+                messages.success(request, "CSV file uploaded successfully!")
+                return redirect('home')
+
+            except Exception as e:
+                messages.error(request, f"Error processing file: {str(e)}")
+                return redirect('home')
 
     total_income = transactions.filter(type='income').aggregate(Sum('amount'))['amount__sum'] or 0
     total_expense = transactions.filter(type='expense').aggregate(Sum('amount'))['amount__sum'] or 0
@@ -115,10 +170,10 @@ def download_transactions_csv(request):
     response['Content-Disposition'] = 'attachment; filename="transactions.csv"'
 
     writer = csv.writer(response)
-    writer.writerow(["Date", "Description", "Amount", "Type"])
+    writer.writerow(["date", "description", "amount", "type"])
 
     for transaction in transactions:
-        writer.writerow([transaction.date, transaction.description, transaction.amount, transaction.type])
+        writer.writerow([transaction.date.strftime('%Y-%m-%d'), transaction.description, transaction.amount, transaction.type])
 
     return response
 
