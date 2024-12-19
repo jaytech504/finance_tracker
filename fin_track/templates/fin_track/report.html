@@ -1,24 +1,6 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Finance Tracker Dashboard</title>
-  <link rel="stylesheet" type="text/css" href="{% static 'css/main.css' %}">
-</head>
-<body>
-  <div class="container">
-    <!-- Sidebar Menu -->
-    <aside class="sidebar">
-      <div class="logo">Finance.io</div>
-      <nav>
-        <a href="{% url 'home' %}">Dashboard</a>
-        <a href="{% url 'summary' %}">Summary</a>
-        <a href="{% url 'report' %}" class="active">Report</a>
-        
-      </nav>
-    </aside>
+{% extends 'fin_track/base.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
     <main class="main-content">
     <h3>Download Transactions</h3>
     <form method="GET" action="{% url 'download_transactions' %}">
@@ -35,7 +17,5 @@
         
         <button type="submit" class="d-but">Download</button>
     </form>
-</div>
 </main>
-</body>
-</html>
+{% endblock content %}

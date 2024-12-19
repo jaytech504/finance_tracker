@@ -1,0 +1,42 @@
+{% extends 'fin_track/base.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+<main class="main-content">
+    <h2>Income Summary</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Category</th>
+            <th>Total</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in income_summary %}
+        <tr>
+            <td>{{ item.category }}</td>
+            <td>{{ item.total }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<h2>Expense Summary</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Category</th>
+            <th>Total</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in expense_summary %}
+        <tr>
+            <td>{{ item.category }}</td>
+            <td>{{ item.total }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+</main>
+{% endblock content %}

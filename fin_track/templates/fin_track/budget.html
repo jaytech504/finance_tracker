@@ -1,0 +1,73 @@
+{% extends 'fin_track/base.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+<main class="main-content">
+  <h1>Budget Manager</h1>
+  <div id="budgetGrid"></div>
+</main>
+  
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const container = document.getElementById("budgetGrid");
+  
+      // Initialize Handsontable
+      const hot = new Handsontable(container, {
+        licenseKey: "non-commercial-and-evaluation", // Replace with a valid license if needed
+        colHeaders: ["ID", "Category", "Budgeted Amount", "Actual Amount"],
+        columns: [
+          { data: "id", readOnly: true },
+          { data: "category", type: "text" },
+          { data: "budgeted_amount", type: "numeric", numericFormat: { pattern: "0,0.00" } },
+          { data: "actual_amount", type: "numeric", numericFormat: { pattern: "0,0.00" } },
+        ],
+        rowHeaders: true,
+        stretchH: "all",
+        height: 500,
+        width: "100%",
+        manualRowMove: true,
+        manualColumnResize: true,
+        contextMenu: true,
+        afterChange: function (changes, source) {
+          if (source === "edit") {
+            const data = hot.getData();
+            fetch("{% url 'update_budget' %}", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": "{{ csrf_token }}",
+              },
+              body: JSON.stringify(data),
+            })
+              .then((response) => response.json())
+              .then((result) => {
+                if (result.status !== "success") {
+                  alert("Error saving changes: " + result.message);
+                }
+              })
+              .catch((error) => console.error("Error:", error));
+          }
+        },
+      });
+  
+      // Load initial data
+      fetch("{% url 'budget_data' %}")
+        .then((response) => response.json())
+        .then((data) => hot.loadData(data))
+        .catch((error) => console.error("Error loading data:", error));
+    });
+    hot.updateSettings({
+  afterChange: function (changes, source) {
+    if (source === "edit") {
+      const data = hot.getData();
+      const totalBudgeted = data.reduce((sum, row) => sum + (parseFloat(row[2]) || 0), 0);
+      const totalActual = data.reduce((sum, row) => sum + (parseFloat(row[3]) || 0), 0);
+
+      const totalsRow = ["", "Totals", totalBudgeted.toFixed(2), totalActual.toFixed(2)];
+      data.push(totalsRow);
+      hot.loadData(data);
+    }
+  },
+});
+
+  </script>
+{% endblock content %}

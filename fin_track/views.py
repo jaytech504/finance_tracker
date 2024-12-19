@@ -1,6 +1,6 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse, HttpResponse
-from .models import Transaction
+from .models import Transaction, Budget
 from .forms import TransactionForm
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
@@ -220,3 +220,43 @@ def download_transactions(request):
         return download_transactions_csv(request)
     elif file_type == 'pdf':
         return download_transactions_pdf(request)
+
+@login_required
+def budget_data(request):
+    """Serve budget data for the logged-in user."""
+    budgets = Budget.objects.filter(user=request.user).values(
+        "id", "category", "budgeted_amount", "actual_amount"
+    )
+    return JsonResponse(list(budgets), safe=False)
+
+@csrf_exempt
+@login_required
+def update_budget(request):
+    """Handle updates made through the Handsontable grid."""
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)  # Parse the JSON payload
+            for row in data:
+                budget_id = row.get("id")
+                if budget_id:  # Update existing budget
+                    budget = Budget.objects.get(id=budget_id, user=request.user)
+                    budget.category = row.get("category")
+                    budget.budgeted_amount = row.get("budgeted_amount")
+                    budget.actual_amount = row.get("actual_amount")
+                    budget.save()
+                else:  # Create a new budget entry if no ID exists
+                    Budget.objects.create(
+                        user=request.user,
+                        category=row.get("category"),
+                        budgeted_amount=row.get("budgeted_amount"),
+                        actual_amount=row.get("actual_amount"),
+                    )
+            return JsonResponse({"status": "success"})
+        except Exception as e:
+            return JsonResponse({"status": "error", "message": str(e)}, status=400)
+
+    return JsonResponse({"status": "error", "message": "Invalid request"}, status=400)
+
+@login_required
+def budget_page(request):
+    return render(request, "fin_track/budget.html")

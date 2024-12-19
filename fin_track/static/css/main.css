@@ -175,7 +175,7 @@
   width: 80px;
 }
 .d-but{
-  width: 80px;
+  width: 30%;
 }
 input, textarea, select {
     width: 80%; /* Set to 100% of the container width */

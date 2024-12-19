@@ -1,0 +1,38 @@
+{% extends 'fin_track/base.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+<main class="main-content">
+<div class="container mt-4">
+    <h2>Your Budgets</h2>
+    <a href="{% url 'add_budget' %}" class="btn btn-primary mb-3">Add New Budget</a>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Category</th>
+                <th>Amount</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for budget in budgets %}
+            <tr>
+                <td>{{ budget.category|default:"Overall" }}</td>
+                <td>${{ budget.amount }}</td>
+                <td>{{ budget.start_date }}</td>
+                <td>{{ budget.end_date }}</td>
+                <td>
+                    <a href="{% url 'edit_budget' budget.id %}" class="btn btn-sm btn-warning">Edit</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5">No budgets added yet.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+</main>
+{% endblock content %}

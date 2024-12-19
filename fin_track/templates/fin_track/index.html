@@ -1,32 +1,7 @@
+{% extends 'fin_track/base.html' %}
 {% load crispy_forms_tags %}
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Finance Tracker Dashboard</title>
-  <link rel="stylesheet" type="text/css" href="{% static 'css/main.css' %}">
-  <script src="https://connect.withmono.com/connect.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/decimal.js/10.4.3/decimal.min.js"></script>
-</head>
-<body>
-  <div class="container">
-    <!-- Sidebar Menu -->
-    <aside class="sidebar">
-      <div class="logo">Finance.io</div>
-      <nav>
-        <a href="{% url 'home' %}" class="active">Dashboard</a>
-        <button id="open-popup">Add Transaction</button>
-        <a href="{% url 'summary' %}">Summary</a>
-        <a href="{% url 'report' %}">Report</a>
-        <a href="{% url 'logout' %}">Logout</a>
-        
-      </nav>
-    </aside>
-    <!-- Main Content Area -->
-    <main class="main-content">
+{% block content %}
+<main class="main-content">
         {% if messages %}
                 <div>
                     {% for message in messages %}
@@ -57,28 +32,6 @@
 
       <!-- Graph and Transaction History -->
       <section class="graph-history">
-        <div class="popup-overlay" id="popup">
-    <div class="popup-content">
-        <span class="close-btn" id="close-popup">&times;</span>
-        <h2> Add Transaction</h2>
-                            <form method="post" class="mb-3">
-                                {% csrf_token %}
-                                {{ form|crispy }}
-                                <button type="submit" class="btn btn-success w-100" name="add_transaction">
-                                    Add Transaction
-                                </button>
-                            </form>
-
-                            <form method="post" enctype="multipart/form-data" class="mb-3">
-                                {% csrf_token %}
-                                
-                                    <input type="file" id="csv_file" name="csv_file" accept=".csv" required>
-                                <button type="submit" class="btn btn-secondary w-100" name="upload_csv">
-                                    Upload CSV
-                                </button>
-                            </form>
-        </div>
-    </div>
         <div class="graph">
         <canvas id="financeChart" width="200" height="100"></canvas>
         <canvas id="transactionsPieChart" width="200" height="100"></canvas>
@@ -94,7 +47,6 @@
         </div>
       </section>
     </main>
-  </div>
   <script>
     const ctx = document.getElementById('financeChart').getContext('2d');
     const financeChart = new Chart(ctx, {
@@ -191,31 +143,4 @@
 
 </script>
 
-<script>
-  document.addEventListener('DOMContentLoaded', function () {
-    const popup = document.getElementById('popup');
-    const openPopupBtn = document.getElementById('open-popup');
-    const closePopupBtn = document.getElementById('close-popup');
-
-    // Open Popup
-    openPopupBtn.addEventListener('click', () => {
-        popup.style.display = 'block';
-    });
-
-    // Close Popup
-    closePopupBtn.addEventListener('click', () => {
-        popup.style.display = 'none';
-    });
-
-    // Close Popup When Clicking Outside the Content
-    window.addEventListener('click', (e) => {
-        if (e.target === popup) {
-            popup.style.display = 'none';
-        }
-    });
-});
-
-</script>
-
-</body>
-</html>
+{% endblock content %}

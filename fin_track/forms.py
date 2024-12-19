@@ -6,3 +6,5 @@ class TransactionForm(forms.ModelForm):
     class Meta:
         model = Transaction
         fields = ['type', 'description', 'amount']
+
+
