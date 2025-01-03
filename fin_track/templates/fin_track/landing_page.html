@@ -115,8 +115,8 @@
             <h1>Track Your Money</h1>
             <p>Simplify your financial journey with cutting-edge tools and insights that help you understand, manage, and optimize your money. Whether you're tracking expenses, analyzing income, or planning for the future, our platform gives you the power to make informed decisions with confidence.</p>
             <div class="hero-buttons">
-                <button class="btn-primary"><a href="{% url 'register' %}">Get Started</a></button>
-                <button class="btn-secondary"><a href="{% url 'login' %}">Sign In</a></button>
+                <a href="{% url 'register' %}"><button class="btn-primary">Get Started</button></a>
+                <a href="{% url 'login' %}"><button class="btn-secondary">Sign In</button></a>
             </div>
         </div>
         <img src="{% static 'finance.png' %}" alt="Illustration" class="illustration">

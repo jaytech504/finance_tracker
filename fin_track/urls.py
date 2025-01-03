@@ -9,7 +9,7 @@ urlpatterns = [
     path('download-transaction/', views.download_transactions, name='download_transactions'),
     path('download-csv/', views.download_transactions_csv, name='download_transactions_csv'),
     path('download-pdf/', views.download_transactions_pdf, name='download_transactions_pdf'),
-    path("budget/", views.budget_page, name="budget_page"),
-    path("budget/data/", views.budget_data, name="budget_data"),
-    path("budget/update/", views.update_budget, name="update_budget"),
+    path('budget/', views.budget, name='budget'),
+    path('budget/<int:budget_id>/update/', views.budget, name='update_budget'),
+    path('budget/<int:budget_id>/delete/', views.budget, name='delete_budget'),
 ]

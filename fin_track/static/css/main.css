@@ -1,8 +1,7 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: Arial, sans-serif;
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
   }
   
   .container {
@@ -74,7 +73,7 @@
   
   .card {
     background-color: #f9f9f9;
-    padding: 20px;
+    padding: 15px;
     border-radius: 10px;
     flex: 1;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -148,24 +147,7 @@
     font-weight: bold;
     cursor: pointer;
   }
-  
-  /* Popup Overlay */
-  .popup-overlay {
-      display: none; /* Hidden by default */
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent background */
-      z-index: 1000;
-  }
 
-  form {
-    display: flex;
-    flex-direction: column;
-    margin-top: 4rem;
-}
 
 .form-group {
     margin-bottom: 15px;
@@ -177,43 +159,54 @@
 .d-but{
   width: 30%;
 }
+
+
+.edit-popup {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 400px;
+  background-color: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+/* Popup overlay styling */
+.overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+}
+
+/* Close button styling */
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+}
+
 input, textarea, select {
-    width: 80%; /* Set to 100% of the container width */
-    max-width: 400px; /* Optional: Limit the maximum width */
-    padding: 7px;
-    margin-top: 5px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 1em;
+  width: 80%; 
+  max-width: 400px; 
+  padding: 7px;
+  margin-top: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1em;
 }
-  
-  /* Popup Content */
-  .popup-content {
-    position: absolute;
-    top: 10%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    padding: 20px;
-    width: 500px;
-    height: 700px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-  
-  /* Close Button */
-  .close-btn {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      font-size: 1.5em;
-      color: #333;
-      cursor: pointer;
-      transition: color 0.3s ease;
-  }
-  
-  .close-btn:hover {
-      color: red;
-  }
   
   /* Open Button */
   button {
@@ -262,7 +255,7 @@ input, textarea, select {
 .transaction-history th {
     background-color: #0095ff;
     color: white;
-    font-size: 1.1em;
+    font-size: 1em;
     text-transform: uppercase;
     letter-spacing: 0.03em;
 }
@@ -271,32 +264,15 @@ input, textarea, select {
     background-color: #f2f2f2;
 }
 
-.transaction-history tr:hover {
-    background-color: #d9e3f7;
-}
-
 .transaction-history td {
-    font-size: 1em;
+    font-size: 0.8em;
     color: #34495e;
 }
 
-.transaction-history .income {
-    color: #27ae60;
-    font-weight: bold;
-}
-
-.transaction-history .expense {
-    color: #e74c3c;
-    font-weight: bold;
-}
 h3 {
     color: #0095ff;
     margin-bottom: 20px;
     margin-top: 20px;
-}
-
-form {
-    margin-bottom: 15px;
 }
 
 label {

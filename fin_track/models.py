@@ -35,13 +35,21 @@ class Transaction(models.Model):
         return self.type == 'expense'
         
 
+
 class Budget(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    category = models.CharField(max_length=255, null=True, blank=True)
-    budgeted_amount = models.DecimalField(max_digits=10, decimal_places=2)
-    actual_amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    created_at = models.DateTimeField(default=timezone.now)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='budgets')
+    name = models.CharField(max_length=255, null=True, blank=True)  # New name field
+    total_budget = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    actual = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    difference = models.DecimalField(max_digits=10, decimal_places=2, editable=False, default=0.00)
+
+
+
+    def save(self, *args, **kwargs):
+        # Automatically calculate the difference
+        self.difference = self.total_budget - self.actual
+        super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.category} - Budget: {self.budgeted_amount}, Actual: {self.actual_amount}"
+        return f"{self.name} - {self.user.username}'s Budget: {self.total_budget}"
 

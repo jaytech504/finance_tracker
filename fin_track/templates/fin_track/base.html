@@ -7,11 +7,65 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Finance Tracker Dashboard</title>
   <link rel="stylesheet" type="text/css" href="{% static 'css/main.css' %}">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/handsontable@12.3.1/dist/handsontable.min.css">
-<script src="https://cdn.jsdelivr.net/npm/handsontable@12.3.1/dist/handsontable.min.js"></script>
-  <script src="https://connect.withmono.com/connect.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/decimal.js/10.4.3/decimal.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<style>
+    #popup {
+    display: none; /* Hidden by default */
+    position: fixed;
+    z-index: 1000; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgba(0, 0, 0, 0.5); /* Black background with opacity */
+}
+
+/* Modal content box */
+.popup-content {
+    background-color: #fefefe;
+    margin: 5% auto; /* 10% from the top and centered */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 50%; /* Adjust as needed */
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    justify-content: center;
+    text-align: center;
+}
+.close-btn {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+.close-btn:hover {
+    color: red;
+}
+form {
+    text-align: center;
+}
+.or-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 20px 0;
+}
+.or-divider::before,
+.or-divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid #ccc;
+}
+.or-divider:not(:empty)::after {
+  margin-left: .25em;
+}
+
+  
+</style>
 </head>
 <body>
   <div class="container">
@@ -19,39 +73,48 @@
     <aside class="sidebar">
       <div class="logo">Finance.io</div>
       <nav>
-        <a href="{% url 'home' %}" class="active">Dashboard</a>
+        <a href="{% url 'home' %}">Dashboard</a>
         <button id="open-popup">Add Transaction</button>
+        <a href="{% url 'budget' %}">Budget</a>
         <a href="{% url 'summary' %}">Summary</a>
         <a href="{% url 'report' %}">Report</a>
         <a href="{% url 'logout' %}">Logout</a>
         
       </nav>
     </aside>
-
     {% block content %}{% endblock content %}
     </div>
     <div class="popup-overlay" id="popup">
         <div class="popup-content">
             <span class="close-btn" id="close-popup">&times;</span>
             <h2> Add Transaction</h2>
-                                <form method="post" class="mb-3">
+                                <form method="post" id="crispy-form">
                                     {% csrf_token %}
-                                    {{ form|crispy }}
-                                    <button type="submit" class="btn btn-success w-100" name="add_transaction">
+                                    <select id="type" name="type" required>
+                                        <option value="" disabled selected>Select a type</option>
+                                        <option value="income">Income</option>
+                                        <option value="expense">Expense</option>
+                                     </select>
+                                <input type="text" name="description" placeholder="Description" required>
+                                <input type="number" name="amount" placeholder="Amount" step="0.01"  required>
+                                    </br>
+                                    <button type="submit" class="btn btn-success" name="add_transaction">
                                         Add Transaction
                                     </button>
                                 </form>
-    
-                                <form method="post" enctype="multipart/form-data" class="mb-3">
+                                <div class="or-divider">or</div>
+                                <form method="post" enctype="multipart/form-data" style="margin-top: 20px;">
                                     {% csrf_token %}
                                     
                                         <input type="file" id="csv_file" name="csv_file" accept=".csv" required>
-                                    <button type="submit" class="btn btn-secondary w-100" name="upload_csv">
+                                </br>
+                                        <button type="submit" class="btn btn-secondary" name="upload_csv">
                                         Upload CSV
                                     </button>
                                 </form>
             </div>
         </div>
+    
     <script>
         document.addEventListener('DOMContentLoaded', function () {
           const popup = document.getElementById('popup');

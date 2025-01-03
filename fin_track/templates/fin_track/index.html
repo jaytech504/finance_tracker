@@ -2,13 +2,6 @@
 {% load crispy_forms_tags %}
 {% block content %}
 <main class="main-content">
-        {% if messages %}
-                <div>
-                    {% for message in messages %}
-                        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
-                    {% endfor %}
-                </div>
-            {% endif %}
       <!-- Header with Profile -->
       <header class="header">
         <div class="profile">Hi, {{ user.username }}</div>
@@ -46,6 +39,7 @@
           </ul>
         </div>
       </section>
+      
     </main>
   <script>
     const ctx = document.getElementById('financeChart').getContext('2d');

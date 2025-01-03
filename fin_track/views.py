@@ -1,15 +1,19 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse, HttpResponse
 from .models import Transaction, Budget
-from .forms import TransactionForm
+from .forms import TransactionForm, BudgetForm
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
 from django.contrib.auth.models import User
+from django.urls import reverse_lazy
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from reportlab.lib import colors
 from django.contrib.auth.decorators import login_required
+from google.oauth2.service_account import Credentials
+from googleapiclient.discovery import build
 import json
 import os
 import csv
@@ -222,41 +226,60 @@ def download_transactions(request):
         return download_transactions_pdf(request)
 
 @login_required
-def budget_data(request):
-    """Serve budget data for the logged-in user."""
-    budgets = Budget.objects.filter(user=request.user).values(
-        "id", "category", "budgeted_amount", "actual_amount"
-    )
-    return JsonResponse(list(budgets), safe=False)
+def budget(request, budget_id=None):
+    budgets = Budget.objects.filter(user=request.user)
+    form = BudgetForm()
+    total_budget = float(budgets.aggregate(Sum('total_budget'))['total_budget__sum']) or 0
+    total_actual = float(budgets.aggregate(Sum('actual'))['actual__sum']) or 0
+    difference = total_budget - total_actual
 
-@csrf_exempt
-@login_required
-def update_budget(request):
-    """Handle updates made through the Handsontable grid."""
+    edit_budget = None
+    edit_form = None
+
+    # Identify the budget being edited or deleted for both GET and POST requests
+    if budget_id:
+        edit_budget = get_object_or_404(Budget, id=budget_id, user=request.user)
+        edit_form = BudgetForm(instance=edit_budget)
+
     if request.method == "POST":
-        try:
-            data = json.loads(request.body)  # Parse the JSON payload
-            for row in data:
-                budget_id = row.get("id")
-                if budget_id:  # Update existing budget
-                    budget = Budget.objects.get(id=budget_id, user=request.user)
-                    budget.category = row.get("category")
-                    budget.budgeted_amount = row.get("budgeted_amount")
-                    budget.actual_amount = row.get("actual_amount")
-                    budget.save()
-                else:  # Create a new budget entry if no ID exists
-                    Budget.objects.create(
-                        user=request.user,
-                        category=row.get("category"),
-                        budgeted_amount=row.get("budgeted_amount"),
-                        actual_amount=row.get("actual_amount"),
-                    )
-            return JsonResponse({"status": "success"})
-        except Exception as e:
-            return JsonResponse({"status": "error", "message": str(e)}, status=400)
+        if 'create_budget' in request.POST:
+            # Handle budget creation
+            form = BudgetForm(request.POST)
+            if form.is_valid():
+                budget = form.save(commit=False)
+                budget.user = request.user
+                budget.save()
+                return redirect("budget")
 
-    return JsonResponse({"status": "error", "message": "Invalid request"}, status=400)
+        elif 'edit_budget' in request.POST:
+            # Handle budget editing
+            if not edit_budget:
+                return redirect("budget")  # If no valid budget to edit, redirect back
 
-@login_required
-def budget_page(request):
-    return render(request, "fin_track/budget.html")
+            edit_form = BudgetForm(request.POST, instance=edit_budget)
+            if edit_form.is_valid():
+                edit_form.save()
+                return redirect("budget")
+
+        elif 'delete_budget' in request.POST:
+            # Handle budget deletion
+            if not edit_budget:
+                return redirect("budget")  # If no valid budget to delete, redirect back
+
+            edit_budget.delete()
+            return redirect("budget")
+
+    context = {
+        'form': form,
+        'edit_form': edit_form,
+        'budgets': budgets,
+        'edit_budget': edit_budget,
+        'total_budget': total_budget,
+        'total_actual': total_actual,
+        'difference': difference,
+    }
+    return render(request, 'fin_track/budget.html', context)
+
+
+
+
