@@ -22,12 +22,20 @@ Visualize your budget progress with intuitive graphs and metrics.
 👤 User Authentication
 
 Securely create an account, log in, and log out.
+
 🛠️ Technology Stack
+
 Frontend: HTML, CSS, Javascript, Bootstrap, Chart.js
+
 Backend: Django, Python
+
 Database: SQLite3
+
 File Formats: PDF and CSV generation
+
 Hosting: [Pythonanywhere]
+
+
 🖼️ Screenshots
 
 Dashboard: A sample income/expense chart.
@@ -52,7 +60,7 @@ Steps
 
 1. Clone the repository:
 
-git clone https://github.com/your-username/finish-ceremony-tracker.git
+git clone https://github.com/jaytech504/finance_tracker.git
 
 cd finish-ceremony-tracker
 
