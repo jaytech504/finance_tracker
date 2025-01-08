@@ -62,7 +62,7 @@ Steps
 
 git clone https://github.com/jaytech504/finance_tracker.git
 
-cd finish-ceremony-tracker
+cd finance_tracker
 
 2. Install dependencies:
 
