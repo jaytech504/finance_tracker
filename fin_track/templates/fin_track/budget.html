@@ -2,8 +2,25 @@
 {% load crispy_forms_tags %}
 {% block content %}
     <main class="main-content">
-        <button onclick="createPop()">Add Budget</button>
-        <div class="transaction-history">
+        <div style="margin-bottom: 10px;">
+        <button onclick="createPop()">Add Budget</button> 
+        <form method="POST" style="display: inline; margin-bottom: 10px;">
+            {% csrf_token %}
+            <label>Total Income</label>
+            <input 
+        type="number" 
+        id="id_total_income" 
+        name="total_income" 
+        value="{{ total_form.instance.total_income }}"
+        required
+    >
+            <button type="submit" name="total_income">Submit</button>
+        </form>
+        <span style="font-weight: bolder;">Left for spending = {{ left_spend }}</span>
+        </div>
+    <section class="summary-cards">
+        <div class="card">
+        <div class="transaction-history" id="budget-table">
         
         <table>
             <thead>
@@ -11,7 +28,6 @@
                     <th>Description</th>
                     <th>Amount</th>
                     <th>Actual</th>
-                    <th>Difference</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -21,34 +37,38 @@
                     <td>{{ budget.name }}</td>
                     <td>{{ budget.total_budget }}</td>
                     <td>{{ budget.actual }}</td>
-                    <td>{{ budget.difference }}</td>
                     <td>
                         <!-- Edit Button -->
-                        <button onclick="openPopup({{ budget.id }}, '{{ budget.name }}', {{ budget.total_budget }}, '{{ budget.actual }}')">
-                            <i class="far fa-edit"></i>
+                        <button class="buton" onclick="openPopup({{ budget.id }}, '{{ budget.name }}', {{ budget.total_budget }}, '{{ budget.actual }}')">
+                            <i class="bi bi-pencil-fill"></i>
                         </button>
         
                         <!-- Delete Button -->
                         <form method="POST" action="{% url 'delete_budget' budget.id %}" style="display: inline;">
                             {% csrf_token %}
                             <input type="hidden" name="delete_budget" value="true">
-                            <button type="submit" onclick="return confirm('Are you sure you want to delete this budget? {{ budget.name }}');">
-                                <i class="far fa-trash-alt"></i>
+                            <button type="submit"  class="buton" onclick="return confirm('Are you sure you want to delete this budget? {{ budget.name }}');">
+                                <i class="bi bi-trash-fill"></i>
                             </button>
                         </form>
                     </td>
                 </tr>
                 {% endfor %}
-                <tr>
+                <tr class="total">
                     <td>Total</td>
                     <td>{{ total_budget }}</td>
                     <td>{{ total_actual }}</td>
-                    <td>{{ difference }}</td>
                     <td></td>
                 </tr>
             </tbody>
         </table>
         </div>
+        </div>
+        <div class="card">
+            <h2>Budget Overview</h2>
+            <canvas id="budgetPieChart" width="300" height="150"></canvas>
+        </div>
+    </section>
         
         <!-- Overlay for Popups -->
         <div class="overlay" id="popupOverlay"></div>
@@ -80,6 +100,7 @@
             <button type="submit" name="create_budget">Submit</button>
         </form>
         </div>
+        
 
        
     </main>
@@ -121,5 +142,45 @@
             document.getElementById('popupOverlay').style.display = 'none';
         }
     </script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Get data from Django context
+        const labels = {{ labels|safe }};  // Labels from context
+        const values = {{ values|safe }};  // Values from context
+
+        const ctx = document.getElementById('budgetPieChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: values,
+                    backgroundColor: [
+                        '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'
+                    ],
+                    hoverBackgroundColor: [
+                        '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                return context.label + ': ' + context.raw;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
    
     {% endblock content%}

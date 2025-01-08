@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse, HttpResponse
-from .models import Transaction, Budget
-from .forms import TransactionForm, BudgetForm
+from .models import Transaction, Budget, TotalIncome
+from .forms import TransactionForm, BudgetForm, TotalForm
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from reportlab.pdfgen import canvas
@@ -104,7 +104,7 @@ def home(request):
     balance = total_income - total_expense
 
     tot_history = list(transactions)
-    trans_history = tot_history[-1:-11:-1]
+    trans_history = tot_history[0:11:]
 
 
     user = request.user
@@ -228,10 +228,16 @@ def download_transactions(request):
 @login_required
 def budget(request, budget_id=None):
     budgets = Budget.objects.filter(user=request.user)
+    total_in, created = TotalIncome.objects.get_or_create(user=request.user)
     form = BudgetForm()
-    total_budget = float(budgets.aggregate(Sum('total_budget'))['total_budget__sum']) or 0
-    total_actual = float(budgets.aggregate(Sum('actual'))['actual__sum']) or 0
-    difference = total_budget - total_actual
+    total_form = TotalForm(instance=total_in)
+    income_value = total_form.instance.total_income
+    total_budget = budgets.aggregate(Sum('total_budget'))['total_budget__sum'] or 0
+    total_actual = budgets.aggregate(Sum('actual'))['actual__sum'] or 0
+    left_spend = income_value - total_budget
+
+    labels = list(budgets.values_list('name', flat=True))
+    values = [float(v) for v in budgets.values_list('total_budget', flat=True)]
 
     edit_budget = None
     edit_form = None
@@ -269,14 +275,33 @@ def budget(request, budget_id=None):
             edit_budget.delete()
             return redirect("budget")
 
+        elif 'total_income' in request.POST:
+            post_data = request.POST.copy()  # Create a mutable copy of request.POST
+            total_income_values = post_data.getlist('total_income')  # Get all values for 'total_income'
+            if len(total_income_values) > 1:
+                # Use the first non-empty value
+                post_data['total_income'] = next((val for val in total_income_values if val.strip()), '')
+            total_form = TotalForm(post_data, instance=total_in)
+            if total_form.is_valid():
+                totalincome = total_form.save(commit=False)
+                totalincome.user = request.user
+                totalincome.save()
+                return redirect("budget")
+            else:
+                print(total_form.errors)
+
     context = {
         'form': form,
         'edit_form': edit_form,
+        'total_form': total_form,
         'budgets': budgets,
+        'total_income': total_in,
         'edit_budget': edit_budget,
         'total_budget': total_budget,
         'total_actual': total_actual,
-        'difference': difference,
+        'left_spend': left_spend,
+        'labels': labels,
+        'values': values
     }
     return render(request, 'fin_track/budget.html', context)
 

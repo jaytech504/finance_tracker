@@ -33,12 +33,18 @@ class Transaction(models.Model):
     @property
     def is_expense(self):
         return self.type == 'expense'
-        
 
+
+class TotalIncome(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    total_income = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+
+    def __str__(self):
+        return f"{self.user.username}: {self.total_income}"
 
 class Budget(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='budgets')
-    name = models.CharField(max_length=255, null=True, blank=True)  # New name field
+    name = models.CharField(max_length=255, null=True, blank=True)
     total_budget = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     actual = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     difference = models.DecimalField(max_digits=10, decimal_places=2, editable=False, default=0.00)
