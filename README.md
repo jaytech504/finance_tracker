@@ -47,39 +47,44 @@ Report: For downloading transactions.
 Prerequisites
 Python 3.10+
 Virtual environment (optional but recommended)
+
 Steps
-Clone the repository:
+
+1. Clone the repository:
 
 git clone https://github.com/your-username/finish-ceremony-tracker.git
+
 cd finish-ceremony-tracker
 
-Install dependencies:
+2. Install dependencies:
 
-bash
-Copy code
 pip install -r requirements.txt
 
-Set up the database:
+3. Set up the database:
 
 Update your DATABASES configuration in settings.py.
 
-Apply migrations:
-bash
-Copy code
+4. Apply migrations:
+
 python manage.py migrate
 
-Run the server:
-bash
-Copy code
+5. Run the server:
+
 python manage.py runserver
+
 Open the app in your browser at http://127.0.0.1:8000.
 
 🔧 Usage
 Register/Login: Create an account or log in to your existing account.
+
 Add Transactions: Log your income or expenses under categories manually or by uploading csv file.
+
 View Dashboard: Check your financial insights.
+
 Generate Reports: Export transactions as PDF or CSV.
+
 Set a Budget: Monitor and visualize your spending against your budget.
+
 🛡️ Security
 Uses Django’s built-in authentication system for secure user management.
 
