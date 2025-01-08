@@ -4,7 +4,7 @@
     <main class="main-content">
         <div style="margin-bottom: 10px;">
         <button onclick="createPop()">Add Budget</button> 
-        <form method="POST" style="display: inline; margin-bottom: 10px;">
+        <form method="POST" style="display: inline-flex;">
             {% csrf_token %}
             <label>Total Income</label>
             <input 
@@ -13,10 +13,11 @@
         name="total_income" 
         value="{{ total_form.instance.total_income }}"
         required
+        width="40%"
     >
             <button type="submit" name="total_income">Submit</button>
         </form>
-        <span style="font-weight: bolder;">Left for spending = {{ left_spend }}</span>
+        <span style="font-weight: bolder; display: inline;" >Left for spending = {{ left_spend }}</span>
         </div>
     <section class="summary-cards">
         <div class="card">

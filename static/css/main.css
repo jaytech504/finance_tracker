@@ -192,13 +192,15 @@ body {
 /* Close button styling */
 
 input, textarea, select {
-  width: 80%;  
+  width: 50%;  
   padding: 7px;
   margin-top: 10px;
   border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 1em;
 }
+
+
 
 #budgetPieChart {
   max-width: 400px;
@@ -354,7 +356,7 @@ label {
 input[type="date"] {
     margin: 10px 0;
     padding: 10px;
-    width: 100%;
+    width: 80%;
     border: 1px solid #ddd;
     border-radius: 4px;
 }
@@ -362,7 +364,7 @@ input[type="date"] {
 select {
     margin: 10px 0;
     padding: 10px;
-    width: 100%;
+    width: 50%;
     border: 1px solid #ddd;
     border-radius: 4px;
 }
