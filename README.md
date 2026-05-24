@@ -53,8 +53,7 @@ Report: For downloading transactions.
 📦 Installation
 
 Prerequisites
-Python 3.10+
-Virtual environment (optional but recommended)
+
 
 Steps
 
@@ -83,7 +82,7 @@ python manage.py runserver
 Open the app in your browser at http://127.0.0.1:8000.
 
 🔧 Usage
-Register/Login: Create an account or log in to your existing account.
+Register/Login: Create an account 
 
 Add Transactions: Log your income or expenses under categories manually or by uploading csv file.
 
@@ -102,8 +101,7 @@ We welcome contributions! To get started:
 Fork the repository.
 Create a new branch for your feature or bug fix.
 Open a pull request describing your changes.
-📜 License
-This project is licensed under the MIT License. See the LICENSE file for details.
+
 
 📧 Contact
 For support or inquiries, please contact:
