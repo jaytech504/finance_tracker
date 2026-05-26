@@ -24,8 +24,7 @@ from django.contrib import messages
 
 
 
-def landing_page(request):
-    return render(request, 'fin_track/landing_page.html')
+
 
 @login_required
 def home(request):
